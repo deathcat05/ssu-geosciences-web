@@ -1,0 +1,19 @@
+#model-option
+{
+    color: black;
+    font-weight: bold
+}
+
+#other-option
+{
+    color: black;
+    font-weight: bold
+}
+
+.row-margin-bot {
+    margin-bottom: 2em
+}
+
+.row-center{
+    margin: auto
+}
