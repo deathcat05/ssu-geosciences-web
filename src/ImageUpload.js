@@ -2,6 +2,9 @@ import React from 'react';
 import axios from 'axios';
 import './ImageUpload.css';
 
+/*class Prediction extends React.Component {
+
+}*/
 class ImageUpload extends React.Component {
     constructor(props) {
         super(props);
@@ -63,7 +66,7 @@ class ImageUpload extends React.Component {
                         <input type="file" class="btn" onChange={this.handleImagePreview} />
                     </div>
                     <div className="col-md-2">
-                        <button type="submit" className="btn btn-outline-dark" onClick={this.handleImageUpload}> Upload Photo </button>
+                        <button type="submit" className="btn btn-outline-dark" onClick={this.handleImageUpload}> Classify </button>
                     </div>
                 </div>
                 <div className="row row-margin-bot">
@@ -92,7 +95,7 @@ class ImageUpload extends React.Component {
                     </div>
                </div>
                <div>
-                    <img src={this.state.imagePreviewUrl} className="img-preview" alt="" />
+                    <img src={this.state.imagePreviewUrl} className="img-thumbnail img-responsive" alt="" />
                </div>
                 
             </form>
