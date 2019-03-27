@@ -12,7 +12,7 @@ class Prediction extends React.Component {
         this.state = {
             file: null,
             imagePreviewUrl: null,
-            prediciton: null
+            prediciton: []
         };
 
         this.handleImagePreview = this.handleImagePreview.bind(this);
@@ -24,8 +24,9 @@ class Prediction extends React.Component {
         console.log(responseData);
         let classification = responseData.data;
         console.log(classification);
+        let individualClassification = classification.split(',');
         this.setState({
-            prediciton: classification
+            prediciton: individualClassification
         });
     }
 
@@ -70,11 +71,11 @@ class Prediction extends React.Component {
     render() {
         return (
             <form method='post' action='http://localhost:5000/classify' encType="multipart/form-data" onSubmit={this.classifyImage}>    
-                <div className="row row-margin-bot row-center">
+                <div className="row row-margin-bot">
                     <div className="col-md-5"> 
                         <input type="file" class="btn" onChange={this.handleImagePreview} />
                     </div>
-                    <div className="col-md-2">
+                    <div className="col-md-0.1">
                         <button type="submit" className="btn btn-outline-dark" onClick={this.classifyImage}> Classify </button>
                     </div>
                 </div>
@@ -103,14 +104,16 @@ class Prediction extends React.Component {
 
                     </div>
                </div>
-               <div>
-                    <img src={this.state.imagePreviewUrl} className="img-thumbnail img-responsive" alt="" />
-               </div>
-               <div className="classificationList">
-                   <h5>Prediction: </h5>
-                   <p>{this.state.prediciton}</p>
-               </div>
-                
+                <div className="row row-margin-bot">
+                    <div className="col-md-2">
+                        <h5>Prediction: </h5>
+                        <ul>{this.state.prediciton.map((element, idx) => <li key={idx}>{element}</li>)}
+                        </ul>
+                    </div>
+                    <div className="col-md-8">
+                        <img src={this.state.imagePreviewUrl} className="img-thumbnail img-responsive" alt="" />
+                    </div>
+                </div>
             </form>
         )
     }
