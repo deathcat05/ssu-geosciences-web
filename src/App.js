@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import './App.css';
-import ImageUpload from './ImageUpload';
+import Prediction from './Prediction';
 
 class App extends Component {
   render() {
@@ -10,7 +10,7 @@ class App extends Component {
           <h1 className="display-4"> Animal Identification using Machine Learning </h1>
           <p> The purpose of this application is to display a prediction given a certain image upload.</p>
         </div>
-        <ImageUpload />
+        <Prediction />
       </div>
     );
   }

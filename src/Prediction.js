@@ -1,25 +1,35 @@
 import React from 'react';
 import axios from 'axios';
-import './ImageUpload.css';
+import './Prediction.css';
 
 /*class Prediction extends React.Component {
 
 }*/
-class ImageUpload extends React.Component {
+class Prediction extends React.Component {
     constructor(props) {
         super(props);
 
         this.state = {
             file: null,
-            imagePreviewUrl: null
+            imagePreviewUrl: null,
+            prediciton: null
         };
 
         this.handleImagePreview = this.handleImagePreview.bind(this);
-        this.handleImageUpload = this.handleImageUpload.bind(this);
+        this.classifyImage = this.classifyImage.bind(this);
+    }
+    classificationResults (response){
+        console.log(response);
+        let responseData = JSON.parse(JSON.stringify(response));
+        console.log(responseData);
+        let classification = responseData.data;
+        console.log(classification);
+        this.setState({
+            prediciton: classification
+        });
     }
 
-
-    handleImageUpload(uploadEvent) {
+    async classifyImage(uploadEvent) {
 
         // console.log("image upload")
         uploadEvent.preventDefault();
@@ -31,14 +41,13 @@ class ImageUpload extends React.Component {
         formData.append('file', fileToUpload);
         console.log(formData)
 
-        axios({
+       return axios({
             method: 'post',
-            url: 'http://localhost:5000/upload',
+            url: 'http://localhost:5000/classify',
             data: formData,
             config: { headers: { 'Content-Type': 'multipart/form-data' } }
         })
-            .then(response => console.log(response))
-            .catch(errors => console.log(errors))
+        .then(response => this.classificationResults(response))
 
     }
 
@@ -60,13 +69,13 @@ class ImageUpload extends React.Component {
 
     render() {
         return (
-            <form method='post' action='http://localhost:5000/upload' encType="multipart/form-data" onSubmit={this.handleImageUpload}>    
+            <form method='post' action='http://localhost:5000/classify' encType="multipart/form-data" onSubmit={this.classifyImage}>    
                 <div className="row row-margin-bot row-center">
                     <div className="col-md-5"> 
                         <input type="file" class="btn" onChange={this.handleImagePreview} />
                     </div>
                     <div className="col-md-2">
-                        <button type="submit" className="btn btn-outline-dark" onClick={this.handleImageUpload}> Classify </button>
+                        <button type="submit" className="btn btn-outline-dark" onClick={this.classifyImage}> Classify </button>
                     </div>
                 </div>
                 <div className="row row-margin-bot">
@@ -97,10 +106,14 @@ class ImageUpload extends React.Component {
                <div>
                     <img src={this.state.imagePreviewUrl} className="img-thumbnail img-responsive" alt="" />
                </div>
+               <div className="classificationList">
+                   <h5>Prediction: </h5>
+                   <p>{this.state.prediciton}</p>
+               </div>
                 
             </form>
         )
     }
 }
 
-export default ImageUpload;
+export default Prediction;
