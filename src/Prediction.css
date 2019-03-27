@@ -17,3 +17,18 @@
 .row-center{
     margin-block-start: 5em
 }
+.classificationList {
+    list-style-type: circle;
+    margin-left: 1em
+}
+.predictionDiv {
+    margin-top: 5em
+}
+
+.choseImageDiv {
+    margin-top: 5em
+}
+
+.optionsDiv {
+    margin-top: 5em
+}

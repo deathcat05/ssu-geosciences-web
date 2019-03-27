@@ -22,7 +22,7 @@ class Prediction extends React.Component {
         console.log(response);
         let responseData = JSON.parse(JSON.stringify(response));
         console.log(responseData);
-        let classification = responseData.data;
+        let classification = responseData.data.replace(/[^a-zA-Z0-9 , _]/g, "");
         console.log(classification);
         let individualClassification = classification.split(',');
         this.setState({
@@ -71,15 +71,18 @@ class Prediction extends React.Component {
     render() {
         return (
             <form method='post' action='http://localhost:5000/classify' encType="multipart/form-data" onSubmit={this.classifyImage}>    
-                <div className="row row-margin-bot">
+                <div className="row row-margin-bot choseImageDiv">
                     <div className="col-md-5"> 
                         <input type="file" class="btn" onChange={this.handleImagePreview} />
                     </div>
                     <div className="col-md-0.1">
                         <button type="submit" className="btn btn-outline-dark" onClick={this.classifyImage}> Classify </button>
                     </div>
+                    <div className="">
+
+                    </div>
                 </div>
-                <div className="row row-margin-bot">
+                <div className="row row-margin-bot optionsDiv">
                     <div className="col-md-2" id="model-option">
                         Model
                     </div>
@@ -104,13 +107,14 @@ class Prediction extends React.Component {
 
                     </div>
                </div>
-                <div className="row row-margin-bot">
+                <div className="row row-margin-bot predictionDiv">
                     <div className="col-md-2">
                         <h5>Prediction: </h5>
-                        <ul>{this.state.prediciton.map((element, idx) => <li key={idx}>{element}</li>)}
-                        </ul>
+                        <ol className="classificationList">
+                            {this.state.prediciton.map((element, idx) => <li key={idx}>{element}</li>)}
+                        </ol>
                     </div>
-                    <div className="col-md-8">
+                    <div className="col-md-10">
                         <img src={this.state.imagePreviewUrl} className="img-thumbnail img-responsive" alt="" />
                     </div>
                 </div>
