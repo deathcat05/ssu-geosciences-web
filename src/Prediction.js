@@ -38,15 +38,14 @@ class Prediction extends React.Component {
         console.log('the selectedModelOption is:', this.state.selectedModelOption);
         uploadEvent.preventDefault();
         let fileToUpload = this.state.file;
-        let modelOption = this.state.value;
- 
-
+        let modelOption = this.state.selectedModelOption;
+        console.log(modelOption);
 
         const formData = new FormData();
 
         formData.append('file', fileToUpload);
         formData.append('options', modelOption);
-
+        console.log(formData);
        return axios({
             method: 'post',
             url: 'http://localhost:5000/classify',
@@ -91,13 +90,12 @@ class Prediction extends React.Component {
             <form method='post' action='http://localhost:5000/classify' encType="multipart/form-data" onSubmit={this.classifyImage}>    
                 <div className="row row-margin-bot choseImageDiv">
                     <div className="col-md-5"> 
-                        <input type="file" class="btn" onChange={this.handleImagePreview} />
+                        <input type="file" className="btn" onChange={this.handleImagePreview} />
                     </div>
                     <div className="col-md-0.1">
                         <button type="submit" className="btn btn-outline-dark" onClick={this.classifyImage}> Classify </button>
                     </div>
                     <div className="">
-
                     </div>
                 </div>
                 <div className="row row-margin-bot optionsDiv">

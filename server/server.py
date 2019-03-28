@@ -32,6 +32,8 @@ def hello_world():
 @app.route('/classify', methods=['POST'])
 def classify():
     image = request.files['file'].read()
+    option = request.form['options']
+    print('option is:', option)
     image = cv2.imdecode(np.frombuffer(image, dtype=np.uint8), -1)
     resized_image = cv2.resize(image, (224, 224))
     labels = NN.clean_classify_one_image(resized_image)
