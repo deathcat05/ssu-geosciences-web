@@ -12,11 +12,13 @@ class Prediction extends React.Component {
         this.state = {
             file: null,
             imagePreviewUrl: null,
+            selectedModelOption: '',
             prediciton: []
         };
 
         this.handleImagePreview = this.handleImagePreview.bind(this);
         this.classifyImage = this.classifyImage.bind(this);
+        this.handleModelOptionChange = this.handleModelOptionChange.bind(this);
     }
     classificationResults (response){
         console.log(response);
@@ -32,15 +34,18 @@ class Prediction extends React.Component {
 
     async classifyImage(uploadEvent) {
 
-        // console.log("image upload")
+        console.log('inside classifyImage');
+        console.log('the selectedModelOption is:', this.state.selectedModelOption);
         uploadEvent.preventDefault();
         let fileToUpload = this.state.file;
+        let modelOption = this.state.value;
+ 
 
-        //console.log(fileToUpload);
+
         const formData = new FormData();
 
         formData.append('file', fileToUpload);
-        console.log(formData)
+        formData.append('options', modelOption);
 
        return axios({
             method: 'post',
@@ -68,6 +73,19 @@ class Prediction extends React.Component {
         reader.readAsDataURL(file)
     }
 
+    handleModelOptionChange(changeEvent){
+        console.log('inside handleModelOptionChange')
+        console.log('selectedModelOption is initially:', this.state.selectedModelOption);
+        let newModelOption = changeEvent.target.value;
+
+        console.log(newModelOption);
+        this.setState({
+            selectedModelOption: newModelOption
+        });
+
+        console.log('selectedModelOption is now:', this.state.newModelOption);
+    }
+
     render() {
         return (
             <form method='post' action='http://localhost:5000/classify' encType="multipart/form-data" onSubmit={this.classifyImage}>    
@@ -87,11 +105,11 @@ class Prediction extends React.Component {
                         Model
                     </div>
                     <div className="col-md-0.5 custom-radio custom-control custom-radio custom-control-inline">
-                        <input type="radio" className="custom-control-input" id="resnet-input"/>
+                        <input type="radio" className="custom-control-input" id="resnet-input" value="resnet" checked={this.state.selectedModelOption === 'resnet'} onChange={this.handleModelOptionChange}/>
                         <label className="custom-control-label" htmlFor="resnet-input">ResNet</label>
                     </div>
                     <div className="col-md-0.5 custom-radio custom-control custom-radio custom-control-inline" >
-                        <input type="radio" className="custom-control-input" id="inception-input"/>
+                        <input type="radio" className="custom-control-input" id="inception-input" value="inception" checked={this.state.selectedModelOption === 'inception'} onChange={this.handleModelOptionChange}/>
                         <label className="custom-control-label" htmlFor="inception-input">Inception</label>
                     </div>
                     <div className="col-md-3" id="other-option">
