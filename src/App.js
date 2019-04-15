@@ -7,8 +7,8 @@ class App extends Component {
     return (
       <div className="App">
         <div className="jumbotron">
-          <h1 className="display-4"> Animal Identification using Machine Learning </h1>
-          <p> The purpose of this application is to display a prediction given a certain image upload.</p>
+          <h1 className="display-4"> Sigma Clast Recoginition using Transfer Leanring </h1>
+          <p> The purpose of this application is to display whether a stone contains a sigma clast or not.</p>
         </div>
         <Prediction />
       </div>

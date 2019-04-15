@@ -12,7 +12,7 @@ import tensorflow as tf
 
 class NN(object):
     def __init__(self):
-        self.base_model = load_base_model('ResNet50', None)
+        self.base_model = load_base_model(option, None)
         self.graph = tf.get_default_graph()
 
         # Use correct image preprocessing for model
