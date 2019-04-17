@@ -13,12 +13,14 @@ class Prediction extends React.Component {
             file: null,
             imagePreviewUrl: null,
             selectedModelOption: '',
+            selectedOtherOptions: [],
             prediciton: []
         };
 
         this.handleImagePreview = this.handleImagePreview.bind(this);
         this.classifyImage = this.classifyImage.bind(this);
         this.handleModelOptionChange = this.handleModelOptionChange.bind(this);
+        this.handleOtherOptionsChange = this.handleOtherOptionsChange.bind(this);
     }
     classificationResults (response){
         console.log(response);
@@ -39,12 +41,15 @@ class Prediction extends React.Component {
         uploadEvent.preventDefault();
         let fileToUpload = this.state.file;
         let modelOption = this.state.selectedModelOption;
+        let otherOptions = this.state.selectedOtherOptions;
+
         console.log(modelOption);
 
         const formData = new FormData();
 
         formData.append('file', fileToUpload);
-        formData.append('options', modelOption);
+        formData.append('model', modelOption);
+        formData.append('options', otherOptions);
         console.log(formData);
        return axios({
             method: 'post',
@@ -72,6 +77,18 @@ class Prediction extends React.Component {
         reader.readAsDataURL(file)
     }
 
+    handleOtherOptionsChange(changeEvent){
+        console.log('inside handleOtherOptionsChange')
+        console.log('selectedOtherOptions are', this.state.selectedOtherOptions);
+        console.log(changeEvent.target.value)
+        let newOtherOptions = this.state.selectedOtherOptions;
+        newOtherOptions.push(changeEvent.target.value);
+
+        console.log(newOtherOptions);
+        this.setState({
+            selectedOtherOptions: newOtherOptions
+        })
+    }
     handleModelOptionChange(changeEvent){
         console.log('inside handleModelOptionChange')
         console.log('selectedModelOption is initially:', this.state.selectedModelOption);
@@ -110,16 +127,25 @@ class Prediction extends React.Component {
                         <input type="radio" className="custom-control-input" id="inception-input" value="inception" checked={this.state.selectedModelOption === 'inception'} onChange={this.handleModelOptionChange}/>
                         <label className="custom-control-label" htmlFor="inception-input">Inception</label>
                     </div>
+                    <div className="col-md-0.5 custom-radio custom-control custom-radio custom-control-inline" >
+                        <input type="radio" className="custom-control-input" id="inception-input" value="vgg16" checked={this.state.selectedModelOption === 'vgg16'} onChange={this.handleModelOptionChange} />
+                        <label className="custom-control-label" htmlFor="vgg16-input">VGG16</label>
+                    </div>
                     <div className="col-md-3" id="other-option">
                         Other Options
                     </div>
                     <div className="col-md-1 custom-control custom-checkbox">
-                        <input type="checkbox" className="custom-control-input" id="ensembles-check"/>
+                        <input type="checkbox" className="custom-control-input" id="ensembles-check" value="ensembles"  onChange={this.handleOtherOptionsChange}/>
                         <label className="custom-control-label" htmlFor="ensembles-check">Ensembles</label>
                     </div>
                     <div className="col-md-0.5 custom-control custom-checkbox">
-                        <input type="checkbox" className="custom-control-input" id="fine-tuning-check"/>
+                        <input type="checkbox" className="custom-control-input" id="fine-tuning-check" value="fine-tuning" onChange={this.handleOtherOptionsChange}/>
                         <label className="custom-control-label" htmlFor="fine-tuning-check">Fine Tuning</label>
+
+                    </div>
+                    <div className="col-md-0.5 custom-control custom-checkbox">
+                        <input type="checkbox" className="custom-control-input" id="other-check" value="other" onChange={this.handleOtherOptionsChange} />
+                        <label className="custom-control-label" htmlFor="other-check">Another Option</label>
 
                     </div>
                </div>
