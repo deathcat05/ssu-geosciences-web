@@ -10,7 +10,7 @@ class Prediction extends React.Component {
         super(props);
 
         this.state = {
-            file: null,
+            image: null,
             imagePreviewUrl: null,
             selectedModelOption: '',
             selectedOtherOptions: [],
@@ -39,7 +39,7 @@ class Prediction extends React.Component {
         console.log('inside classifyImage');
         console.log('the selectedModelOption is:', this.state.selectedModelOption);
         uploadEvent.preventDefault();
-        let fileToUpload = this.state.file;
+        let imageToUpload = this.state.image;
         let modelOption = this.state.selectedModelOption;
         let otherOptions = this.state.selectedOtherOptions;
 
@@ -47,7 +47,7 @@ class Prediction extends React.Component {
 
         const formData = new FormData();
 
-        formData.append('file', fileToUpload);
+        formData.append('image', imageToUpload);
         formData.append('model', modelOption);
         formData.append('options', otherOptions);
         console.log(formData);
@@ -65,16 +65,16 @@ class Prediction extends React.Component {
         console.log('in preview')
 
         let reader = new FileReader();
-        let file = previewEvent.target.files[0];
+        let image = previewEvent.target.files[0];
 
         reader.onloadend = () => {
             this.setState({
-                file: file,
+                image: image,
                 imagePreviewUrl: reader.result
             });
         }
 
-        reader.readAsDataURL(file)
+        reader.readAsDataURL(image)
     }
 
     handleOtherOptionsChange(changeEvent){
@@ -128,7 +128,7 @@ class Prediction extends React.Component {
                         <label className="custom-control-label" htmlFor="inception-input">Inception</label>
                     </div>
                     <div className="col-md-0.5 custom-radio custom-control custom-radio custom-control-inline" >
-                        <input type="radio" className="custom-control-input" id="inception-input" value="vgg16" checked={this.state.selectedModelOption === 'vgg16'} onChange={this.handleModelOptionChange} />
+                        <input type="radio" className="custom-control-input" id="vgg16-input" value="vgg16" checked={this.state.selectedModelOption === 'vgg16'} onChange={this.handleModelOptionChange} />
                         <label className="custom-control-label" htmlFor="vgg16-input">VGG16</label>
                     </div>
                     <div className="col-md-3" id="other-option">
