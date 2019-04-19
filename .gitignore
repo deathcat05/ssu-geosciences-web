@@ -25,4 +25,4 @@ yarn-error.log*
 /server/__pycache__/
 .vscode/
 
-/models/
+/server/models/
