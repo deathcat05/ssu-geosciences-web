@@ -42,19 +42,24 @@ def start_app():
 @app.route('/classify', methods=['GET', 'POST'])
 def classify():
     model = request.form['model']
-    image = request.files['image'].read()
     options = request.form['options']
+    directory = request.form['directory']
+    #This is only called if the user chose to classify one image
+    if( 'image' in request.files):
+        image = request.files['image'].read()
+        img = cv2.imdecode(np.frombuffer(image, dtype=np.uint8), -1)
+        resized_image = cv2.resize(img, (227, 227))
+        resized_image = np.expand_dims(resized_image, axis=0)
+        resized_image = resized_image / 255
+
+   
     print('options are', options)
-
-    img = cv2.imdecode(np.frombuffer(image, dtype=np.uint8), -1)
-    resized_image = cv2.resize(img, (227, 227))
-    resized_image = np.expand_dims(resized_image, axis=0)
-    resized_image = resized_image / 255 
-
+    #This will classify a directory of images for the user
+    if(directory == 'directory'):
+        print('User wants to classify a directory')
 
     if(model == 'resnet'):
         print('Model chosen is resnet')
-
         modelToUse = models + '/test.h5'
         base_model = resnet_base_model
         model = base_model[0]

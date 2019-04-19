@@ -18,7 +18,6 @@
     margin-block-start: 5em
 }
 .classificationList {
-    list-style-type: circle;
     margin-left: 1em
 }
 .predictionDiv {
@@ -31,4 +30,14 @@
 
 .optionsDiv {
     margin-top: 5em
+}
+
+ol li {
+    list-style-type: none;
+}
+
+img{
+    height: 500px;
+    width: 500px;
+    align-content: center
 }

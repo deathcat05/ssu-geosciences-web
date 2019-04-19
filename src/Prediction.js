@@ -11,26 +11,32 @@ class Prediction extends React.Component {
 
         this.state = {
             image: null,
+            directory: '',
             imagePreviewUrl: null,
             selectedModelOption: '',
             selectedOtherOptions: [],
-            prediciton: []
+            withSigmaPrediciton: '',
+            withoutSigmaPrediction: '',
+            checked: false
         };
 
         this.handleImagePreview = this.handleImagePreview.bind(this);
         this.classifyImage = this.classifyImage.bind(this);
         this.handleModelOptionChange = this.handleModelOptionChange.bind(this);
         this.handleOtherOptionsChange = this.handleOtherOptionsChange.bind(this);
+        this.classifyDirectory = this.classifyDirectory.bind(this);
     }
     classificationResults (response){
         console.log(response);
         let responseData = JSON.parse(JSON.stringify(response));
         console.log(responseData);
-        let classification = responseData.data.replace(/[^a-zA-Z0-9 , _]/g, "");
+        let classification = responseData.data.split(',')
         console.log(classification);
-        let individualClassification = classification.split(',');
+        let withSigma = classification[0];
+        let withoutSigma = classification[1];
         this.setState({
-            prediciton: individualClassification
+            withSigmaPrediciton: withSigma,
+            withoutSigmaPrediction: withoutSigma
         });
     }
 
@@ -42,15 +48,30 @@ class Prediction extends React.Component {
         let imageToUpload = this.state.image;
         let modelOption = this.state.selectedModelOption;
         let otherOptions = this.state.selectedOtherOptions;
+        let classifyDirectoryOption = this.state.directory;
 
         console.log(modelOption);
 
         const formData = new FormData();
-
-        formData.append('image', imageToUpload);
-        formData.append('model', modelOption);
-        formData.append('options', otherOptions);
-        console.log(formData);
+        //If the directory was chosen, don't send the image data. 
+        if(this.state.image === null)
+        {
+            formData.append('image', this.state.image);
+            formData.append('model', modelOption);
+            formData.append('options', otherOptions);
+            formData.append('directory', classifyDirectoryOption);
+        }
+        console.log(formData)
+        //If the image was chosen, don't send the directory data.
+        if(this.state.directory === '')
+        {
+            formData.append('image', imageToUpload);
+            formData.append('model', modelOption);
+            formData.append('options', otherOptions);
+            formData.append('directory', this.state.directory);
+        }
+        console.log(formData)
+        
        return axios({
             method: 'post',
             url: 'http://localhost:5000/classify',
@@ -60,10 +81,25 @@ class Prediction extends React.Component {
         .then(response => this.classificationResults(response))
 
     }
-
+    classifyDirectory(changeEvent){
+        console.log('inside classifyDirectory')
+        if (this.state.image) {
+            alert("You have already chosen to classify an image!");
+            return
+        }
+       
+        let directoryChosen = changeEvent.target.value;
+        this.setState({
+            directory: directoryChosen,
+            checked: true
+        });
+    }
     handleImagePreview(previewEvent) {
         console.log('in preview')
-
+        if(this.state.directory){
+            alert("You have already chosen to classify a directory!");
+            return
+        }
         let reader = new FileReader();
         let image = previewEvent.target.files[0];
 
@@ -81,6 +117,7 @@ class Prediction extends React.Component {
         console.log('inside handleOtherOptionsChange')
         console.log('selectedOtherOptions are', this.state.selectedOtherOptions);
         console.log(changeEvent.target.value)
+     
         let newOtherOptions = this.state.selectedOtherOptions;
         newOtherOptions.push(changeEvent.target.value);
 
@@ -93,7 +130,6 @@ class Prediction extends React.Component {
         console.log('inside handleModelOptionChange')
         console.log('selectedModelOption is initially:', this.state.selectedModelOption);
         let newModelOption = changeEvent.target.value;
-
         console.log(newModelOption);
         this.setState({
             selectedModelOption: newModelOption
@@ -106,13 +142,15 @@ class Prediction extends React.Component {
         return (
             <form method='post' action='http://localhost:5000/classify' encType="multipart/form-data" onSubmit={this.classifyImage}>    
                 <div className="row row-margin-bot choseImageDiv">
-                    <div className="col-md-5"> 
+                    <div className="col-md-4"> 
                         <input type="file" className="btn" onChange={this.handleImagePreview} />
+                    </div>
+                    <div className="col-md-3 custom-control custom-checkbox">
+                        <input type="checkbox" className="custom-control-input" id="directory-input" value="directory" checked={this.state.checked} onChange={this.classifyDirectory} />
+                        <label className="custom-control-label" htmlFor="directory-input">Classify a Directory</label>
                     </div>
                     <div className="col-md-0.1">
                         <button type="submit" className="btn btn-outline-dark" onClick={this.classifyImage}> Classify </button>
-                    </div>
-                    <div className="">
                     </div>
                 </div>
                 <div className="row row-margin-bot optionsDiv">
@@ -150,14 +188,16 @@ class Prediction extends React.Component {
                     </div>
                </div>
                 <div className="row row-margin-bot predictionDiv">
-                    <div className="col-md-2">
-                        <h5>Prediction: </h5>
-                        <ol className="classificationList">
-                            {this.state.prediciton.map((element, idx) => <li key={idx}>{element}</li>)}
-                        </ol>
-                    </div>
-                    <div className="col-md-10">
+                    <div className="col-md-6">
                         <img src={this.state.imagePreviewUrl} className="img-thumbnail img-responsive" alt="" />
+                    </div>
+
+                    <div className="col-md-2">
+                        <h5>Prediction Confidence: </h5>
+                        <ol className="classificationList">
+                            <li> With Sigma: {this.state.withSigmaPrediciton}</li>
+                            <li>Without Sigma: {this.state.withoutSigmaPrediction}</li>
+                        </ol>
                     </div>
                 </div>
             </form>
