@@ -62,6 +62,7 @@ def classify():
         model_with_transfer.load_weights(modelToUse)
         prediction = model_with_transfer.predict(resized_image)
         predicted_classes = np.argmax(prediction, axis=1)
+        
         print(prediction)
         print(predicted_classes)
         return predicted_classes
@@ -79,17 +80,11 @@ def classify():
         prediction = model_with_transfer.predict(resized_image)
         predicted_classes = np.argmax(prediction, axis=1)
         prediction_list = prediction.tolist()
-        prediction_string = str(prediction_list).split(',')
-        prediction_string[0].replace('[', '')
-        prediction_string[1].replace(']', '')
-        print(prediction_string[0])
-        print(prediction_string[1])
-
-        if(predicted_classes == 0):
-            return ('with sigma:' + prediction_string[0] + '%')
-        if(predicted_classes == 1): 
-            return ('without sigma:' + prediction_string[1] + '%')
-        
+        withS = '{: .3f}'.format(prediction_list[0][0])
+        withoutS = '{: .3f}'.format(prediction_list[0][1])
+        predictions = withS + ',' + withoutS;
+        print(predictions)
+        return predictions
 
     if(model == 'vgg16'):
         print('Model chosen is vgg16')
