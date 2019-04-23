@@ -7,7 +7,7 @@ class App extends Component {
     return (
       <div className="App">
         <div className="jumbotron">
-          <h1 className="display-4"> Sigma Clast Recognition using Transfer Leanring </h1>
+          <h1 className="display-4"> Sigma Clast Recognition using Transfer Learning </h1>
           <p> The purpose of this application is to display whether a stone contains a sigma clast or not.</p>
         </div>
         <Prediction />

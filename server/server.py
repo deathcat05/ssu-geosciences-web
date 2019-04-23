@@ -23,8 +23,8 @@ imagesDir = '/Users/deathcat05/Desktop/ssu-geosciences-web/server/images'
 #Loading the base models 
 models = '/Users/deathcat05/Desktop/ssu-geosciences-web/server/models'
 inception_base_model = load_base_model("InceptionV3", (227, 227, 3))
-#resnet_base_model = load_base_model("ResNet50", (224, 224, 3))
-#vgg16_base_model = load_base_model("VGG16", (224, 224, 3))
+resnet_base_model = load_base_model("ResNet50", (224, 224, 3))
+vgg16_base_model = load_base_model("VGG16", (224, 224, 3))
 
 app = Flask(__name__)
 CORS(app)
@@ -43,15 +43,13 @@ def classify():
     model = request.form['model']
     options = request.form['options']
     directory = request.form['directory']
+
     #This is only called if the user chose to classify one image
     if( 'image' in request.files):
         print('User wants to classify an image')
         image = request.files['image'].read()
         img = cv2.imdecode(np.frombuffer(image, dtype=np.uint8), -1)
-        resized_image = cv2.resize(img, (227, 227))
-        resized_image = np.expand_dims(resized_image, axis=0)
-        #resized_image = resized_image / 255
-        predict_one_image(resized_image, model, options)
+        predict_one_image(img, model, options)
 
     #This will classify a directory of images for the user
     if(directory == 'directory'):
@@ -68,8 +66,12 @@ def load_images(folder, img_size):
 
         images = []
         filenames = []
-        for filename in os.listdir(imagesDir):
+        ignore_list = ['.AppleDouble', 'pycache', '.DS_Store']
+        for filename in os.listdir(folder):
+                if filename in ignore_list:
+                        continue
                 img = Image.open(os.path.join(folder, filename))
+                print(img)
 
                 if img is not None:
                         rbgimg = Image.new("RGB", img.size)
@@ -86,19 +88,89 @@ def load_images(folder, img_size):
 def predict_one_image(imageToPredict, model, options):
     print('inside predict_one_image function')
     print('imageToPredict is: ', imageToPredict)
-    print('model is:', model)
     print('options are:', options)
+
     if(model == 'inception'):
         print('Model chosen is inception')
-        modelToUse = models +'/test.h5'
+        modelToUse = models +'/inceptionWeights.h5'
         print(modelToUse)
+
+        #Resize image for inception model
+        resized_image = cv2.resize(imageToPredict, (227, 227))
+        resized_image = np.expand_dims(resized_image, axis=0)
+        resized_image = resized_image / 255
+
+        #Creating components for transfer learning prediction
         base_model = inception_base_model
         model = base_model[0]
         model_with_transfer = create_final_layers(model, 227, labels=['with', 'without'])
         print('print created final layers successful')
         model_with_transfer.load_weights(modelToUse)
         print('ran load_weights function')
-        prediction = model_with_transfer.predict(imageToPredict)
+        prediction = model_with_transfer.predict(resized_image)
+        print(prediction)
+
+        '''
+       # prediction = model_with_transfer.predict(resized_image)
+        predicted_classes = np.argmax(prediction, axis=1)
+        prediction_list = prediction.tolist()
+        withS = '{: .3f}'.format(prediction_list[0][0])
+        withoutS = '{: .3f}'.format(prediction_list[0][1])
+        predictions = withS + ',' + withoutS;
+        print(predictions)
+        return predictions
+        '''
+        return prediction
+    
+    if(model == 'resnet'):
+        print('Model chosen is resnet')
+        modelToUse = models +'/resnetWeights.h5'
+        print(modelToUse)
+
+        #Resize image for resnet model.
+        resized_image = cv2.resize(imageToPredict, (224, 224))
+        resized_image = np.expand_dims(resized_image, axis=0)
+        resized_image = resized_image / 255
+
+        #Creating components for transfer learning prediction
+        base_model = resnet_base_model
+        model = base_model[0]
+        model_with_transfer = create_final_layers(model, 224, labels=['with', 'without'])
+        print('print created final layers successful')
+        model_with_transfer.load_weights(modelToUse)
+        print('ran load_weights function')
+        prediction = model_with_transfer.predict(resized_image)
+        print(prediction)
+
+        '''
+       # prediction = model_with_transfer.predict(resized_image)
+        predicted_classes = np.argmax(prediction, axis=1)
+        prediction_list = prediction.tolist()
+        withS = '{: .3f}'.format(prediction_list[0][0])
+        withoutS = '{: .3f}'.format(prediction_list[0][1])
+        predictions = withS + ',' + withoutS;
+        print(predictions)
+        return predictions
+        '''
+        return prediction
+    
+    if(model == 'vgg16'):
+        print('Model chosen is vgg16')
+        modelToUse = models +' /vgg16Weights.h5'
+
+        #Resizing image for vgg model
+        resized_image = cv2.resize(imageToPredict, (224, 224))
+        resized_image = np.expand_dims(resized_image, axis=0)
+        resized_image = resized_image / 255
+
+        #Creating components for transfer learning prediction
+        base_model = vgg16_base_model
+        model = base_model[0]
+        model_with_transfer = create_final_layers(model, 224, labels=['with', 'without'])
+        print('print created final layers successful')
+        model_with_transfer.load_weights(modelToUse)
+        print('ran load_weights function')
+        prediction = model_with_transfer.predict(resized_image)
         print(prediction)
 
         '''
