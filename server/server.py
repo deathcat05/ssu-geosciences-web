@@ -199,13 +199,11 @@ def predict_images(images, model, options):
                 #predicted_class = predicted_class / total_images
                 print(predictions)
         
-        
         conf_matrix = confusion_matrix(actual, predictions)
         conf_matrix = conf_matrix.astype('float') / conf_matrix.sum(axis=1)[:, np.newaxis]
+        conf_matrix = np.array2string(conf_matrix)
         print(conf_matrix)
-        
-
-        return predictions
+        return conf_matrix
 
 if __name__ == '__main__':
     app.run()
