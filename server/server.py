@@ -49,13 +49,13 @@ def classify():
         print('User wants to classify an image')
         image = request.files['image'].read()
         img = cv2.imdecode(np.frombuffer(image, dtype=np.uint8), -1)
-        predict_one_image(img, model, options)
+        return predict_one_image(img, model, options)
 
     #This will classify a directory of images for the user
     if(directory == 'directory'):
         print('User wants to classify a directory')
         new_image = load_images(imagesDir, 227)
-        predict_images(new_image, model, options)
+        return predict_images(new_image, model, options)
 
 def load_images(folder, img_size):
         '''
@@ -83,7 +83,6 @@ def load_images(folder, img_size):
 
 def predict_one_image(imageToPredict, model, options):
     print('inside predict_one_image function')
-    print('imageToPredict is: ', imageToPredict)
     print('options are:', options)
 
     if(model == 'inception'):
@@ -105,19 +104,17 @@ def predict_one_image(imageToPredict, model, options):
         model_with_transfer.load_weights(modelToUse)
         print('ran load_weights function')
         prediction = model_with_transfer.predict(resized_image)
-        print(prediction)
+        print('Prediction is:', prediction)
 
-        '''
-       # prediction = model_with_transfer.predict(resized_image)
-        predicted_classes = np.argmax(prediction, axis=1)
+        #Need to convert the array to a list so that the data can be cleanly sent back to front-end
         prediction_list = prediction.tolist()
-        withS = '{: .3f}'.format(prediction_list[0][0])
+        
+        withS = '{: .3f}'.format(prediction_list[0][0]) #This rounds result to three decimal places
         withoutS = '{: .3f}'.format(prediction_list[0][1])
-        predictions = withS + ',' + withoutS;
-        print(predictions)
+        predictions = withS + ',' + withoutS
         return predictions
-        '''
-        return prediction
+        
+        #return prediction
     
     if(model == 'resnet'):
         print('Model chosen is resnet')
@@ -137,19 +134,16 @@ def predict_one_image(imageToPredict, model, options):
         model_with_transfer.load_weights(modelToUse)
         print('ran load_weights function')
         prediction = model_with_transfer.predict(resized_image)
-        print(prediction)
 
-        '''
-       # prediction = model_with_transfer.predict(resized_image)
-        predicted_classes = np.argmax(prediction, axis=1)
+        #Need to convert the array to a list so that the data can be cleanly sent back to front-end
+        print('Prediction is:', prediction)
         prediction_list = prediction.tolist()
         withS = '{: .3f}'.format(prediction_list[0][0])
         withoutS = '{: .3f}'.format(prediction_list[0][1])
-        predictions = withS + ',' + withoutS;
+        predictions = withS + ',' + withoutS
         print(predictions)
         return predictions
-        '''
-        return prediction
+        #return prediction
     
     if(model == 'vgg16'):
         print('Model chosen is vgg16')
@@ -168,19 +162,16 @@ def predict_one_image(imageToPredict, model, options):
         model_with_transfer.load_weights(modelToUse)
         print('ran load_weights function')
         prediction = model_with_transfer.predict(resized_image)
-        print(prediction)
+        print('Prediction is:, ', prediction)
 
-        '''
-       # prediction = model_with_transfer.predict(resized_image)
-        predicted_classes = np.argmax(prediction, axis=1)
+        
+       #Need to convert the array to a list so that the data can be cleanly sent back to front-end
         prediction_list = prediction.tolist()
         withS = '{: .3f}'.format(prediction_list[0][0])
         withoutS = '{: .3f}'.format(prediction_list[0][1])
-        predictions = withS + ',' + withoutS;
+        predictions = withS + ',' + withoutS
         print(predictions)
         return predictions
-        '''
-        return prediction
 
 def predict_images(images, model, options):
     print('inside predict_images function')
