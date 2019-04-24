@@ -205,9 +205,10 @@ def predict_images(images, model, options):
         
         conf_matrix = confusion_matrix(actual, predictions)
         conf_matrix = conf_matrix.astype('float') / conf_matrix.sum(axis=1)[:, np.newaxis]
-        conf_matrix = np.array2string(conf_matrix) #Need to convert to string to send back to front-end
-        print(conf_matrix)
-        return conf_matrix
+        row1 = np.array2string(conf_matrix[0])
+        row2 = np.array2string(conf_matrix[1])
+        conf_matrix_as_string = row1 + ',' + row2
+        return conf_matrix_as_string
 
 if __name__ == '__main__':
     app.run()
