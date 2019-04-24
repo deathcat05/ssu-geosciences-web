@@ -13,6 +13,8 @@ from model import load_base_model, create_final_layers
 import numpy as np
 import cv2
 from PIL import Image
+from sklearn.metrics import confusion_matrix
+
 
 #Allowed image extensions
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg'])
@@ -66,17 +68,18 @@ def load_images(folder, img_size):
 
         images = []
         #filenames = []
-        ignore_list = ['.AppleDouble', 'pycache', '.DS_Store']
+        ignore_list = ['.AppleDouble', '__pycache__', '.DS_Store']
         for filename in os.listdir(folder):
-                if(filename != '.DS_Store'):
-                        img = Image.open(os.path.join(folder, filename))
+                if(filename in ignore_list):
+                        continue
+
+                img = Image.open(os.path.join(folder, filename))
                 if img is not None:
                         rgb_image = Image.new("RGB", img.size)
                         rgb_image.paste(img)
                         rgb_image = rgb_image.resize((img_size, img_size), Image.ANTIALIAS)
                         image_as_array = np.array(rgb_image)
                         images.append(image_as_array)
-                        #filenames.append(filename)
 
         images = np.array(images)
         return images
@@ -175,9 +178,8 @@ def predict_one_image(imageToPredict, model, options):
 
 def predict_images(images, model, options):
     print('inside predict_images function')
-    print('model is:', model)
-    print('options are:', options)
     predictions = []
+    actual = [1, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0, 0, 1, 1, 0]
     if(model == 'inception'):
         print('Model chosen is inception')
         modelToUse = models +'/test.h5'
@@ -187,12 +189,22 @@ def predict_images(images, model, options):
         print('print created final layers successful')
         model_with_transfer.load_weights(modelToUse)
         print('load_weights successful')
+        total_images = len(images)
+        print(total_images)
         for image in images:
                 resized_image = np.expand_dims(image, axis=0)
                 prediction = model_with_transfer.predict(resized_image)
-                #print(prediction)
-                predictions.append(prediction)
-        print(predictions)
+                predicted_class = np.argmax(prediction)
+                predictions.append(predicted_class)
+                #predicted_class = predicted_class / total_images
+                print(predictions)
+        
+        
+        conf_matrix = confusion_matrix(actual, predictions)
+        conf_matrix = conf_matrix.astype('float') / conf_matrix.sum(axis=1)[:, np.newaxis]
+        print(conf_matrix)
+        
+
         return predictions
 
 if __name__ == '__main__':
