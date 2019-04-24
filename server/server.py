@@ -18,7 +18,7 @@ from PIL import Image
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg'])
 
 #Image directory that will be used if directory is chosen
-imagesDir = '/Users/deathcat05/Desktop/ssu-geosciences-web/server/images'
+imagesDir = '/Users/deathcat05/Desktop/ssu-geosciences-web/server/images/'
 
 #Loading the base models 
 models = '/Users/deathcat05/Desktop/ssu-geosciences-web/server/models'
@@ -54,7 +54,7 @@ def classify():
     #This will classify a directory of images for the user
     if(directory == 'directory'):
         print('User wants to classify a directory')
-        new_image = load_images(imagesDir, 224)
+        new_image = load_images(imagesDir, 227)
         predict_images(new_image, model, options)
 
 def load_images(folder, img_size):
@@ -65,25 +65,21 @@ def load_images(folder, img_size):
         '''
 
         images = []
-        filenames = []
+        #filenames = []
         ignore_list = ['.AppleDouble', 'pycache', '.DS_Store']
         for filename in os.listdir(folder):
-                if filename in ignore_list:
-                        continue
-                img = Image.open(os.path.join(folder, filename))
-                print(img)
-
+                if(filename != '.DS_Store'):
+                        img = Image.open(os.path.join(folder, filename))
                 if img is not None:
-                        rbgimg = Image.new("RGB", img.size)
-                        rbgimg.paste(img)
-                        rbgimg = rbgimg.resize((img_size, img_size), Image.ANTIALIAS)
-                        np_img = np.array(rbgimg)
-                        images.append(np_img)
-                        filenames.append(filename)
+                        rgb_image = Image.new("RGB", img.size)
+                        rgb_image.paste(img)
+                        rgb_image = rgb_image.resize((img_size, img_size), Image.ANTIALIAS)
+                        image_as_array = np.array(rgb_image)
+                        images.append(image_as_array)
+                        #filenames.append(filename)
 
         images = np.array(images)
-
-        return images, filenames
+        return images
 
 def predict_one_image(imageToPredict, model, options):
     print('inside predict_one_image function')
@@ -92,7 +88,8 @@ def predict_one_image(imageToPredict, model, options):
 
     if(model == 'inception'):
         print('Model chosen is inception')
-        modelToUse = models +'/inceptionWeights.h5'
+        modelToUse = models + '/test.h5'
+        #modelToUse = models + '/inceptionWeights.h5'
         print(modelToUse)
 
         #Resize image for inception model
@@ -124,7 +121,7 @@ def predict_one_image(imageToPredict, model, options):
     
     if(model == 'resnet'):
         print('Model chosen is resnet')
-        modelToUse = models +'/resnetWeights.h5'
+        modelToUse = models + '/resnetWeights.h5'
         print(modelToUse)
 
         #Resize image for resnet model.
@@ -156,7 +153,7 @@ def predict_one_image(imageToPredict, model, options):
     
     if(model == 'vgg16'):
         print('Model chosen is vgg16')
-        modelToUse = models +' /vgg16Weights.h5'
+        modelToUse = models + '/vgg16Weights.h5'
 
         #Resizing image for vgg model
         resized_image = cv2.resize(imageToPredict, (224, 224))
@@ -187,32 +184,25 @@ def predict_one_image(imageToPredict, model, options):
 
 def predict_images(images, model, options):
     print('inside predict_images function')
-    print('images are: ', images)
     print('model is:', model)
     print('options are:', options)
+    predictions = []
     if(model == 'inception'):
         print('Model chosen is inception')
         modelToUse = models +'/test.h5'
-        print(modelToUse)
         base_model = inception_base_model
         model = base_model[0]
         model_with_transfer = create_final_layers(model, 227, labels=['with', 'without'])
         print('print created final layers successful')
         model_with_transfer.load_weights(modelToUse)
-        prediction = model_with_transfer.predict(images)
-        print(prediction)
-
-        '''
-       # prediction = model_with_transfer.predict(resized_image)
-        predicted_classes = np.argmax(prediction, axis=1)
-        prediction_list = prediction.tolist()
-        withS = '{: .3f}'.format(prediction_list[0][0])
-        withoutS = '{: .3f}'.format(prediction_list[0][1])
-        predictions = withS + ',' + withoutS;
+        print('load_weights successful')
+        for image in images:
+                resized_image = np.expand_dims(image, axis=0)
+                prediction = model_with_transfer.predict(resized_image)
+                #print(prediction)
+                predictions.append(prediction)
         print(predictions)
         return predictions
-        '''
-        return prediction
 
 if __name__ == '__main__':
     app.run()

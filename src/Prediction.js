@@ -17,6 +17,7 @@ class Prediction extends React.Component {
             selectedOtherOptions: [],
             withSigmaPrediciton: '',
             withoutSigmaPrediction: '',
+            predictions: [],
             checked: false
         };
 
@@ -179,11 +180,6 @@ class Prediction extends React.Component {
                     <div className="col-md-0.5 custom-control custom-checkbox">
                         <input type="checkbox" className="custom-control-input" id="fine-tuning-check" value="fine-tuning" onChange={this.handleOtherOptionsChange}/>
                         <label className="custom-control-label" htmlFor="fine-tuning-check">Fine Tuning</label>
-
-                    </div>
-                    <div className="col-md-0.5 custom-control custom-checkbox">
-                        <input type="checkbox" className="custom-control-input" id="other-check" value="other" onChange={this.handleOtherOptionsChange} />
-                        <label className="custom-control-label" htmlFor="other-check">Another Option</label>
 
                     </div>
                </div>
