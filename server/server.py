@@ -109,12 +109,14 @@ def predict_one_image(imageToPredict, model, options):
         prediction = model_with_transfer.predict(resized_image)
         print('Prediction is:', prediction)
 
-        #Need to convert the array to a list so that the data can be cleanly sent back to front-end
+        #Need to convert the array to indvidual strings so that the data can be cleanly sent back to front-end
         prediction_list = prediction.tolist()
-        
-        withS = '{: .3f}'.format(prediction_list[0][0]) #This rounds result to three decimal places
+        withS = '{: .3f}'.format(prediction_list[0][0])
+        withS_string = "With Sigma:" + withS
         withoutS = '{: .3f}'.format(prediction_list[0][1])
-        predictions = withS + ',' + withoutS
+        withoutS_string = "Without Sigma:" + withoutS
+        predictions = withS_string + ',' + withoutS_string
+        print(predictions)
         return predictions
         
         #return prediction
@@ -168,10 +170,12 @@ def predict_one_image(imageToPredict, model, options):
         print('Prediction is:, ', prediction)
 
         
-       #Need to convert the array to a list so that the data can be cleanly sent back to front-end
+       #Need to convert the array to a string so that the data can be cleanly sent back to front-end
         prediction_list = prediction.tolist()
         withS = '{: .3f}'.format(prediction_list[0][0])
-        withoutS = '{: .3f}'.format(prediction_list[0][1])
+        withS_string = "With Sigma:" + withS
+        print(withS_string)
+        withoutS = "Without Signma: " + '{: .3f}'.format(prediction_list[0][1])
         predictions = withS + ',' + withoutS
         print(predictions)
         return predictions
@@ -197,11 +201,11 @@ def predict_images(images, model, options):
                 predicted_class = np.argmax(prediction)
                 predictions.append(predicted_class)
                 #predicted_class = predicted_class / total_images
-                print(predictions)
+        print(predictions)
         
         conf_matrix = confusion_matrix(actual, predictions)
         conf_matrix = conf_matrix.astype('float') / conf_matrix.sum(axis=1)[:, np.newaxis]
-        conf_matrix = np.array2string(conf_matrix)
+        conf_matrix = np.array2string(conf_matrix) #Need to convert to string to send back to front-end
         print(conf_matrix)
         return conf_matrix
 

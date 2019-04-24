@@ -191,8 +191,8 @@ class Prediction extends React.Component {
                     <div className="col-md-2">
                         <h5>Prediction Confidence: </h5>
                         <ol className="classificationList">
-                            <li> With Sigma: {this.state.withSigmaPrediciton}</li>
-                            <li>Without Sigma: {this.state.withoutSigmaPrediction}</li>
+                            <li> {this.state.withSigmaPrediciton}</li>
+                            <li> {this.state.withoutSigmaPrediction}</li>
                         </ol>
                     </div>
                 </div>
