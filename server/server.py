@@ -13,7 +13,10 @@ from model import load_base_model, create_final_layers
 import numpy as np
 import cv2
 from PIL import Image
+#Needed for confusion matrix
 from sklearn.metrics import confusion_matrix
+import matplotlib.pyplot as plt
+import itertools  
 
 
 #Allowed image extensions
@@ -25,8 +28,8 @@ imagesDir = '/Users/deathcat05/Desktop/ssu-geosciences-web/server/images/'
 #Loading the base models 
 models = '/Users/deathcat05/Desktop/ssu-geosciences-web/server/models'
 inception_base_model = load_base_model("InceptionV3", (227, 227, 3))
-resnet_base_model = load_base_model("ResNet50", (224, 224, 3))
-vgg16_base_model = load_base_model("VGG16", (224, 224, 3))
+#resnet_base_model = load_base_model("ResNet50", (224, 224, 3))
+#vgg16_base_model = load_base_model("VGG16", (224, 224, 3))
 
 app = Flask(__name__)
 CORS(app)
@@ -123,7 +126,8 @@ def predict_one_image(imageToPredict, model, options):
     
     if(model == 'resnet'):
         print('Model chosen is resnet')
-        modelToUse = models + '/resnetWeights.h5'
+        #modelToUse = models + '/resnetWeights.h5'
+        modelToUse = models + '/test.h5'
         print(modelToUse)
 
         #Resize image for resnet model.
@@ -202,14 +206,38 @@ def predict_images(images, model, options):
                 predictions.append(predicted_class)
                 #predicted_class = predicted_class / total_images
         print(predictions)
-        
+
+        #For Confusion matrix
+        '''
         conf_matrix = confusion_matrix(actual, predictions)
         conf_matrix = conf_matrix.astype('float') / conf_matrix.sum(axis=1)[:, np.newaxis]
         row1 = np.array2string(conf_matrix[0])
         row2 = np.array2string(conf_matrix[1])
         conf_matrix_as_string = row1 + ',' + row2
         return conf_matrix_as_string
+        '''
+        classes = [0, 1]
+        title = "Confusion matrix"
+        conf_matrix = confusion_matrix(actual, predictions, labels=[0, 1])
+        conf_matrix = conf_matrix.astype('float') / conf_matrix.sum(axis=1)[:, np.newaxis]
+        #cmap = plt.conf_matrix.Blues
+        plt.figure()
+        plt.imshow(conf_matrix, interpolation='nearest', cmap=plt.cm.Blues)
+        plt.title(title)
+        plt.colorbar()
+        tick_marks = np.arange(len(classes))
+        plt.xticks(tick_marks, classes, rotation=45)
+        plt.yticks(tick_marks, classes)
+        fmt = '.2f'
+        thresh = conf_matrix.max() / 2.
+        for i, j in itertools.product(range(conf_matrix.shape[0]), range(conf_matrix.shape[1])):
+                plt.text(j, i, format(conf_matrix[i, j], fmt), horizontalalignment="center", color="white" if conf_matrix[i, j] > thresh else "black")
 
+        plt.ylabel('True label')
+        plt.xlabel('Predicted label')
+        plt.tight_layout()
+        plt.savefig('confusion_matrix.jpg')
+        
 if __name__ == '__main__':
     app.run()
  
