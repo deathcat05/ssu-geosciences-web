@@ -11,6 +11,7 @@ class Prediction extends React.Component {
 
         this.state = {
             image: null,
+            confusionMatrix: null,
             directory: '',
             imagePreviewUrl: null,
             selectedModelOption: '',
@@ -27,18 +28,35 @@ class Prediction extends React.Component {
         this.handleOtherOptionsChange = this.handleOtherOptionsChange.bind(this);
         this.classifyDirectory = this.classifyDirectory.bind(this);
     }
+
     classificationResults (response){
         console.log(response);
-        let responseData = JSON.parse(JSON.stringify(response));
-        console.log(responseData);
-        let classification = responseData.data.split(',')
-        console.log(classification);
-        let withSigma = classification[0];
-        let withoutSigma = classification[1];
-        this.setState({
-            withSigmaPrediciton: withSigma,
-            withoutSigmaPrediction: withoutSigma
-        });
+        if(this.state.image !== null){
+            let responseData = JSON.parse(JSON.stringify(response));
+            console.log(responseData);
+            let classification = responseData.data.split(',')
+            console.log(classification);
+            let withSigma = classification[0];
+            let withoutSigma = classification[1];
+            this.setState({
+                withSigmaPrediciton: withSigma,
+                withoutSigmaPrediction: withoutSigma
+            });
+        }
+
+        if(this.state.directory !== ''){
+            let responseData = response;
+            console.log(responseData);
+            let classification = responseData.data.split(',')
+            console.log(classification);
+            let withSigma = classification[0];
+            let withoutSigma = classification[1];
+            this.setState({
+                withSigmaPrediciton: withSigma,
+                withoutSigmaPrediction: withoutSigma
+            });
+        }
+ 
     }
 
     async classifyImage(uploadEvent) {
@@ -82,6 +100,7 @@ class Prediction extends React.Component {
         .then(response => this.classificationResults(response))
 
     }
+
     classifyDirectory(changeEvent){
         console.log('inside classifyDirectory')
         if (this.state.image) {
@@ -160,7 +179,7 @@ class Prediction extends React.Component {
                     </div>
                     <div className="col-md-0.5 custom-radio custom-control custom-radio custom-control-inline">
                         <input type="radio" className="custom-control-input" id="resnet-input" value="resnet" checked={this.state.selectedModelOption === 'resnet'} onChange={this.handleModelOptionChange}/>
-                        <label className="custom-control-label" htmlFor="resnet-input">ResNet</label>
+                        <label className="custom-control-label disabled" htmlFor="resnet-input">ResNet</label>
                     </div>
                     <div className="col-md-0.5 custom-radio custom-control custom-radio custom-control-inline" >
                         <input type="radio" className="custom-control-input" id="inception-input" value="inception" checked={this.state.selectedModelOption === 'inception'} onChange={this.handleModelOptionChange}/>
@@ -168,18 +187,18 @@ class Prediction extends React.Component {
                     </div>
                     <div className="col-md-0.5 custom-radio custom-control custom-radio custom-control-inline" >
                         <input type="radio" className="custom-control-input" id="vgg16-input" value="vgg16" checked={this.state.selectedModelOption === 'vgg16'} onChange={this.handleModelOptionChange} />
-                        <label className="custom-control-label" htmlFor="vgg16-input">VGG16</label>
+                        <label className="custom-control-label disabled" htmlFor="vgg16-input">VGG16</label>
                     </div>
                     <div className="col-md-3" id="other-option">
                         Other Options
                     </div>
                     <div className="col-md-1 custom-control custom-checkbox">
                         <input type="checkbox" className="custom-control-input" id="ensembles-check" value="ensembles"  onChange={this.handleOtherOptionsChange}/>
-                        <label className="custom-control-label" htmlFor="ensembles-check">Ensembles</label>
+                        <label className="custom-control-label disabled" htmlFor="ensembles-check">Ensembles</label>
                     </div>
                     <div className="col-md-0.5 custom-control custom-checkbox">
                         <input type="checkbox" className="custom-control-input" id="fine-tuning-check" value="fine-tuning" onChange={this.handleOtherOptionsChange}/>
-                        <label className="custom-control-label" htmlFor="fine-tuning-check">Fine Tuning</label>
+                        <label className="custom-control-label disabled" htmlFor="fine-tuning-check">Fine Tuning</label>
 
                     </div>
                </div>

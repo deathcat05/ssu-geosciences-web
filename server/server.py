@@ -1,7 +1,7 @@
 import os
 import tensorflow as tf
 from tensorflow import keras
-from flask import Flask, flash, request, redirect, url_for
+from flask import Flask, flash, request, redirect, url_for, send_file
 from flask_cors import CORS
 from werkzeug.utils import secure_filename
 from keras.models import Model, load_model#, load_weights
@@ -13,6 +13,7 @@ from model import load_base_model, create_final_layers
 import numpy as np
 import cv2
 from PIL import Image
+
 #Needed for confusion matrix
 from sklearn.metrics import confusion_matrix
 import matplotlib.pyplot as plt
@@ -23,10 +24,11 @@ import itertools
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg'])
 
 #Image directory that will be used if directory is chosen
-imagesDir = '/Users/deathcat05/Desktop/ssu-geosciences-web/server/images/'
+imagesDir = "C:\\Users\\deathcat05\\Desktop\\Repositories\\ssu-geosciences-web\\server\\images\\"  #/Users/deathcat05/Desktop/ssu-geosciences-web/server/images/
 
 #Loading the base models 
-models = '/Users/deathcat05/Desktop/ssu-geosciences-web/server/models'
+models =  "C:\\Users\\deathcat05\\Desktop\\Repositories\\ssu-geosciences-web\\server\\models\\" #'/Users/deathcat05/Desktop/ssu-geosciences-web/server/models'
+
 inception_base_model = load_base_model("InceptionV3", (227, 227, 3))
 #resnet_base_model = load_base_model("ResNet50", (224, 224, 3))
 #vgg16_base_model = load_base_model("VGG16", (224, 224, 3))
@@ -203,19 +205,14 @@ def predict_images(images, model, options):
                 resized_image = np.expand_dims(image, axis=0)
                 prediction = model_with_transfer.predict(resized_image)
                 predicted_class = np.argmax(prediction)
+                if predicted_class == 0:
+                        predicted_class = "without"
+                if predicted_class == 1: 
+                        predicted_class = "without"
                 predictions.append(predicted_class)
-                #predicted_class = predicted_class / total_images
         print(predictions)
 
         #For Confusion matrix
-        '''
-        conf_matrix = confusion_matrix(actual, predictions)
-        conf_matrix = conf_matrix.astype('float') / conf_matrix.sum(axis=1)[:, np.newaxis]
-        row1 = np.array2string(conf_matrix[0])
-        row2 = np.array2string(conf_matrix[1])
-        conf_matrix_as_string = row1 + ',' + row2
-        return conf_matrix_as_string
-        '''
         classes = [0, 1]
         title = "Confusion matrix"
         conf_matrix = confusion_matrix(actual, predictions, labels=[0, 1])
@@ -237,6 +234,9 @@ def predict_images(images, model, options):
         plt.xlabel('Predicted label')
         plt.tight_layout()
         plt.savefig('confusion_matrix.jpg')
+
+        filename = "C:\\Users\\deathcat05\\Desktop\\Repositories\\ssu-geosciences-web\\server\\confusion_matrix.jpg" #'/Users/deathcat05/Desktop/ssu-geosciences-web/server/confusion_matrix.jpg'
+        return send_file(filename, mimetype='image/jpg')
         
 if __name__ == '__main__':
     app.run()
