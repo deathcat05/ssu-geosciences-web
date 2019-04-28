@@ -24,10 +24,10 @@ import itertools
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg'])
 
 #Image directory that will be used if directory is chosen
-imagesDir = "C:\\Users\\deathcat05\\Desktop\\Repositories\\ssu-geosciences-web\\server\\images\\"  #/Users/deathcat05/Desktop/ssu-geosciences-web/server/images/
+imagesDir = "/Users/deathcat05/Desktop/ssu-geosciences-web/server/images/"
 
 #Loading the base models 
-models =  "C:\\Users\\deathcat05\\Desktop\\Repositories\\ssu-geosciences-web\\server\\models\\" #'/Users/deathcat05/Desktop/ssu-geosciences-web/server/models'
+models =  "/Users/deathcat05/Desktop/ssu-geosciences-web/server/models/"
 
 inception_base_model = load_base_model("InceptionV3", (227, 227, 3))
 #resnet_base_model = load_base_model("ResNet50", (224, 224, 3))
@@ -189,7 +189,8 @@ def predict_one_image(imageToPredict, model, options):
 def predict_images(images, model, options):
     print('inside predict_images function')
     predictions = []
-    actual = [1, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0, 0, 1, 1, 0]
+    actual = ['without', 'with', 'with', 'with', 'with', 'with', 'with', 'with', 'without', 'without', 
+             'with', 'with', 'without', 'without', 'without', 'without', 'with', 'with', 'with', 'without', 'without', 'with']
     if(model == 'inception'):
         print('Model chosen is inception')
         modelToUse = models +'/test.h5'
@@ -206,16 +207,16 @@ def predict_images(images, model, options):
                 prediction = model_with_transfer.predict(resized_image)
                 predicted_class = np.argmax(prediction)
                 if predicted_class == 0:
-                        predicted_class = "without"
+                        predicted_class = "with"
                 if predicted_class == 1: 
                         predicted_class = "without"
                 predictions.append(predicted_class)
         print(predictions)
 
         #For Confusion matrix
-        classes = [0, 1]
+        classes = ['with', 'without']
         title = "Confusion matrix"
-        conf_matrix = confusion_matrix(actual, predictions, labels=[0, 1])
+        conf_matrix = confusion_matrix(actual, predictions, labels=['with', 'without'])
         conf_matrix = conf_matrix.astype('float') / conf_matrix.sum(axis=1)[:, np.newaxis]
         #cmap = plt.conf_matrix.Blues
         plt.figure()
@@ -235,7 +236,7 @@ def predict_images(images, model, options):
         plt.tight_layout()
         plt.savefig('confusion_matrix.jpg')
 
-        filename = "C:\\Users\\deathcat05\\Desktop\\Repositories\\ssu-geosciences-web\\server\\confusion_matrix.jpg" #'/Users/deathcat05/Desktop/ssu-geosciences-web/server/confusion_matrix.jpg'
+        filename = "/Users/deathcat05/Desktop/ssu-geosciences-web/server/confusion_matrix.jpg"
         return send_file(filename, mimetype='image/jpg')
         
 if __name__ == '__main__':
