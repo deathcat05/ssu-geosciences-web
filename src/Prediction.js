@@ -10,14 +10,14 @@ class Prediction extends React.Component {
         super(props);
 
         this.state = {
-            image: null,
-            confusionMatrix: '',
-            directory: '',
-            imagePreviewUrl: null,
-            selectedModelOption: '',
-            selectedOtherOptions: [],
-            withSigmaPrediciton: '',
-            withoutSigmaPrediction: '',
+            image: null, //The image file to be classified
+            confusionMatrix: '', //The confusion matrix image that will be returned once directory is classified
+            directory: '', //The option to classify a directory
+            imagePreviewUrl: null, //The image that will be classified
+            selectedModelOption: '', //Which base model to use
+            selectedOtherOptions: [], //Fine tuning, ensembles, etc.
+            withSigmaPrediciton: '', //The with prediction confidence returned from classification
+            withoutSigmaPrediction: '', //The without prediction confidence returned from classification
             predictions: [],
             checked: false
         };
@@ -30,13 +30,14 @@ class Prediction extends React.Component {
         this.classificationResults = this.classificationResults.bind(this);
     }
 
+    /*The classification data returned by axios. */
     classificationResults (response){
         if(this.state.image !== null){
-            let responseData = JSON.parse(JSON.stringify(response));
+            let responseData = JSON.parse(JSON.stringify(response)); //Transform the response data into JSON
             console.log(responseData);
+            //Single image classification is returned as a string, so split by ,.  
             let classification = responseData.data.split(',')
-            console.log(classification);
-            let withSigma = classification[0];
+            let withSigma = classification[0]; 
             let withoutSigma = classification[1];
             this.setState({
                 withSigmaPrediciton: withSigma,
@@ -46,6 +47,8 @@ class Prediction extends React.Component {
 
         if(this.state.directory !== ''){
             let matrixData = response.data;
+            //The confusion matrix image is sent as a base64 encoded string. 
+            //Add data before string so that it can be rendered on the screen. 
             let srcData = "data:image/jpeg;base64," + matrixData;
             this.setState({
                 confusionMatrix: srcData
@@ -53,11 +56,13 @@ class Prediction extends React.Component {
         }
     }
 
+    //This function handles sending the data to Flask through axios so that the image or directory can be classified. 
     async classifyImage(uploadEvent) {
 
         console.log('inside classifyImage');
         console.log('the selectedModelOption is:', this.state.selectedModelOption);
         uploadEvent.preventDefault();
+        //The data to include in the HTTP request 
         let imageToUpload = this.state.image;
         let modelOption = this.state.selectedModelOption;
         let otherOptions = this.state.selectedOtherOptions;
@@ -66,10 +71,11 @@ class Prediction extends React.Component {
         console.log(modelOption);
 
         const formData = new FormData();
+
         //If the directory was chosen, don't send the image data. 
         if(this.state.image === null)
         {
-            formData.append('image', this.state.image);
+            formData.append('image', imageToUpload);
             formData.append('model', modelOption);
             formData.append('options', otherOptions);
             formData.append('directory', classifyDirectoryOption);
@@ -78,13 +84,13 @@ class Prediction extends React.Component {
         //If the image was chosen, don't send the directory data.
         if(this.state.directory === '')
         {
-            formData.append('image', imageToUpload);
+            //formData.append('image', imageToUpload);
+            formData.append('directory', this.state.directory);
             formData.append('model', modelOption);
             formData.append('options', otherOptions);
-            formData.append('directory', this.state.directory);
+            
         }
-       
-        
+       //Send request to Flask 
        const response = await axios({
             method: 'post',
             url: 'http://localhost:5000/classify',
@@ -95,6 +101,8 @@ class Prediction extends React.Component {
 
     }
 
+    //This function will check to see if a user has already chosen to classify an image. 
+    //If not, it sets the directory option which will be sent in the formData of the HTTP request. 
     classifyDirectory(changeEvent){
         console.log('inside classifyDirectory')
         if (this.state.image) {
@@ -108,14 +116,17 @@ class Prediction extends React.Component {
             checked: true
         });
     }
+    //This function will check to see if a user has already chosen to classify a directory. 
+    //If not, it sets the image option which will be sent in the formData of the HTTP request. 
     handleImagePreview(previewEvent) {
         if (this.state.directory !== '') {
             alert("You have already chosen to classify a directory!");
-            previewEvent.target.value = null;
+            previewEvent.target.value = null; //reset the value to null so that the filename doesn't change since the directory button is checked.
             return
             
         }
-        console.log('in preview')
+        
+        //Use FileReader API to get image and display on screen. 
         let reader = new FileReader();
         let image = previewEvent.target.files[0];
 
@@ -128,6 +139,9 @@ class Prediction extends React.Component {
             reader.readAsDataURL(image);
     }
 
+    //This function will set the state of certain options based on which checkboxes were chosen. 
+    //Input: strings i.e ensembles, fine-tuning. 
+    //Output: an array containing the strings. This will be sent in formData of HTTP request. 
     handleOtherOptionsChange(changeEvent){
         console.log('inside handleOtherOptionsChange')
         console.log('selectedOtherOptions are', this.state.selectedOtherOptions);
@@ -141,6 +155,10 @@ class Prediction extends React.Component {
             selectedOtherOptions: newOtherOptions
         })
     }
+    
+     //This function will set the state of the base model to use. 
+    //Input: strings i.e resnet, inception, vgg16. 
+    //Output: The string that corresponds to the model chosen 
     handleModelOptionChange(changeEvent){
         console.log('inside handleModelOptionChange')
         console.log('selectedModelOption is initially:', this.state.selectedModelOption);
