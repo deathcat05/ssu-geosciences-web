@@ -26,3 +26,4 @@ yarn-error.log*
 .vscode/
 
 /server/models/
+/server/confusion_matrix.jpg

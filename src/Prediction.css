@@ -9,7 +9,6 @@
     color: black;
     font-weight: bold
 }
-
 .row-margin-bot {
     margin-bottom: 2em
 }
@@ -33,11 +32,23 @@
 }
 
 ol li {
+    padding-left: 0.2em;
+    padding-top: 1em;
     list-style-type: none;
+    line-height: 1.5;
+}
+#image-to-predict {
+    text-align: center;
 }
 
-img{
-    height: 500px;
-    width: 500px;
-    align-content: center
+#prediction-confidence {
+    text-align: center
+}
+#upload {
+    opacity: 0;
+}
+#confusion-matrix{
+    padding-right: 10em;
+    height: 350px;
+    width: 640px;
 }

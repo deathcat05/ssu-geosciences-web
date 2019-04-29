@@ -1,5 +1,6 @@
 .App {
   text-align: center;
+  height: 100%;
 }
 
 .App-logo {
@@ -22,7 +23,18 @@
 .App-link {
   color: #61dafb;
 }
+.display-4 {
+  color: whitesmoke
+}
 
+#purpose {
+  padding-top: 2em;
+  color: beige
+}
+.jumbotron {
+  background-image: url("https://d1w9csuen3k837.cloudfront.net/Pictures/2000x1125/7/2/3/131723_neural_net_shutterstock_544558780.jpg");
+  background-size: 100%;
+}
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);

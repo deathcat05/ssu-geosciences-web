@@ -11,7 +11,7 @@ class Prediction extends React.Component {
 
         this.state = {
             image: null,
-            confusionMatrix: null,
+            confusionMatrix: '',
             directory: '',
             imagePreviewUrl: null,
             selectedModelOption: '',
@@ -27,10 +27,10 @@ class Prediction extends React.Component {
         this.handleModelOptionChange = this.handleModelOptionChange.bind(this);
         this.handleOtherOptionsChange = this.handleOtherOptionsChange.bind(this);
         this.classifyDirectory = this.classifyDirectory.bind(this);
+        this.classificationResults = this.classificationResults.bind(this);
     }
 
     classificationResults (response){
-        console.log(response);
         if(this.state.image !== null){
             let responseData = JSON.parse(JSON.stringify(response));
             console.log(responseData);
@@ -45,18 +45,12 @@ class Prediction extends React.Component {
         }
 
         if(this.state.directory !== ''){
-            let responseData = response;
-            console.log(responseData);
-            let classification = responseData.data.split(',')
-            console.log(classification);
-            let withSigma = classification[0];
-            let withoutSigma = classification[1];
+            let matrixData = response.data;
+            let srcData = "data:image/jpeg;base64," + matrixData;
             this.setState({
-                withSigmaPrediciton: withSigma,
-                withoutSigmaPrediction: withoutSigma
+                confusionMatrix: srcData
             });
         }
- 
     }
 
     async classifyImage(uploadEvent) {
@@ -80,7 +74,7 @@ class Prediction extends React.Component {
             formData.append('options', otherOptions);
             formData.append('directory', classifyDirectoryOption);
         }
-        console.log(formData)
+
         //If the image was chosen, don't send the directory data.
         if(this.state.directory === '')
         {
@@ -89,7 +83,7 @@ class Prediction extends React.Component {
             formData.append('options', otherOptions);
             formData.append('directory', this.state.directory);
         }
-        console.log(formData)
+       
         
        return axios({
             method: 'post',
@@ -163,7 +157,7 @@ class Prediction extends React.Component {
             <form method='post' action='http://localhost:5000/classify' encType="multipart/form-data" onSubmit={this.classifyImage}>    
                 <div className="row row-margin-bot choseImageDiv">
                     <div className="col-md-4"> 
-                        <input type="file" className="btn" onChange={this.handleImagePreview} />
+                        <input type="file" id="image-to-upload" onChange={this.handleImagePreview} />
                     </div>
                     <div className="col-md-3 custom-control custom-checkbox">
                         <input type="checkbox" className="custom-control-input" id="directory-input" value="directory" checked={this.state.checked} onChange={this.classifyDirectory} />
@@ -178,41 +172,44 @@ class Prediction extends React.Component {
                         Model
                     </div>
                     <div className="col-md-0.5 custom-radio custom-control custom-radio custom-control-inline">
-                        <input type="radio" className="custom-control-input" id="resnet-input" value="resnet" checked={this.state.selectedModelOption === 'resnet'} onChange={this.handleModelOptionChange}/>
-                        <label className="custom-control-label disabled" htmlFor="resnet-input">ResNet</label>
+                        <input type="radio" className="custom-control-input disabled" id="resnet-input" value="resnet" checked={this.state.selectedModelOption === 'resnet'} onChange={this.handleModelOptionChange} disabled/>
+                        <label className="custom-control-label" htmlFor="resnet-input">ResNet</label>
                     </div>
                     <div className="col-md-0.5 custom-radio custom-control custom-radio custom-control-inline" >
                         <input type="radio" className="custom-control-input" id="inception-input" value="inception" checked={this.state.selectedModelOption === 'inception'} onChange={this.handleModelOptionChange}/>
                         <label className="custom-control-label" htmlFor="inception-input">Inception</label>
                     </div>
                     <div className="col-md-0.5 custom-radio custom-control custom-radio custom-control-inline" >
-                        <input type="radio" className="custom-control-input" id="vgg16-input" value="vgg16" checked={this.state.selectedModelOption === 'vgg16'} onChange={this.handleModelOptionChange} />
+                        <input type="radio" className="custom-control-input" id="vgg16-input" value="vgg16" checked={this.state.selectedModelOption === 'vgg16'} onChange={this.handleModelOptionChange} disabled/>
                         <label className="custom-control-label disabled" htmlFor="vgg16-input">VGG16</label>
                     </div>
                     <div className="col-md-3" id="other-option">
                         Other Options
                     </div>
                     <div className="col-md-1 custom-control custom-checkbox">
-                        <input type="checkbox" className="custom-control-input" id="ensembles-check" value="ensembles"  onChange={this.handleOtherOptionsChange}/>
+                        <input type="checkbox" className="custom-control-input" id="ensembles-check" value="ensembles"  onChange={this.handleOtherOptionsChange} disabled/>
                         <label className="custom-control-label disabled" htmlFor="ensembles-check">Ensembles</label>
                     </div>
                     <div className="col-md-0.5 custom-control custom-checkbox">
-                        <input type="checkbox" className="custom-control-input" id="fine-tuning-check" value="fine-tuning" onChange={this.handleOtherOptionsChange}/>
+                        <input type="checkbox" className="custom-control-input" id="fine-tuning-check" value="fine-tuning" onChange={this.handleOtherOptionsChange} disabled/>
                         <label className="custom-control-label disabled" htmlFor="fine-tuning-check">Fine Tuning</label>
 
                     </div>
                </div>
                 <div className="row row-margin-bot predictionDiv">
                     <div className="col-md-6">
-                        <img src={this.state.imagePreviewUrl} className="img-thumbnail img-responsive" alt="" />
+                        <h5 id="image-to-predict">Image to Predict</h5>
+                        <img id="image-preview"src={this.state.imagePreviewUrl} className="img-thumbnail img-responsive" alt="" />
                     </div>
 
-                    <div className="col-md-2">
-                        <h5>Prediction Confidence: </h5>
+                    <div className="col-md-3">
+                        <h5 id="prediction-confidence">Prediction Confidence: </h5>
                         <ol className="classificationList">
                             <li> {this.state.withSigmaPrediciton}</li>
                             <li> {this.state.withoutSigmaPrediction}</li>
-                        </ol>
+                            <img id="confusion-matrix" src={this.state.confusionMatrix} alt="" />
+                        </ol>   
+                        
                     </div>
                 </div>
             </form>
