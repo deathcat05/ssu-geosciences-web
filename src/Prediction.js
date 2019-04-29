@@ -85,13 +85,13 @@ class Prediction extends React.Component {
         }
        
         
-       return axios({
+       const response = await axios({
             method: 'post',
             url: 'http://localhost:5000/classify',
             data: formData,
             config: { headers: { 'Content-Type': 'multipart/form-data' } }
-        })
-        .then(response => this.classificationResults(response))
+        });
+        return this.classificationResults(response);
 
     }
 
@@ -109,11 +109,13 @@ class Prediction extends React.Component {
         });
     }
     handleImagePreview(previewEvent) {
-        console.log('in preview')
-        if(this.state.directory){
+        if (this.state.directory !== '') {
             alert("You have already chosen to classify a directory!");
+            previewEvent.target.value = null;
             return
+            
         }
+        console.log('in preview')
         let reader = new FileReader();
         let image = previewEvent.target.files[0];
 
@@ -123,8 +125,7 @@ class Prediction extends React.Component {
                 imagePreviewUrl: reader.result
             });
         }
-
-        reader.readAsDataURL(image)
+            reader.readAsDataURL(image);
     }
 
     handleOtherOptionsChange(changeEvent){
