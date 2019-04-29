@@ -1,4 +1,4 @@
-import os
+import os, base64
 import tensorflow as tf
 from tensorflow import keras
 from flask import Flask, flash, request, redirect, url_for, send_file
@@ -189,6 +189,7 @@ def predict_one_image(imageToPredict, model, options):
 def predict_images(images, model, options):
     print('inside predict_images function')
     predictions = []
+    #This 'actual' array is the hardcoded values of the images stored in the directory. Used for classifying.
     actual = ['without', 'with', 'with', 'with', 'with', 'with', 'with', 'with', 'without', 'without', 
              'with', 'with', 'without', 'without', 'without', 'without', 'with', 'with', 'with', 'without', 'without', 'with']
     if(model == 'inception'):
@@ -213,12 +214,11 @@ def predict_images(images, model, options):
                 predictions.append(predicted_class)
         print(predictions)
 
-        #For Confusion matrix
+        #Creating the confusion matrix
         classes = ['with', 'without']
         title = "Confusion matrix"
         conf_matrix = confusion_matrix(actual, predictions, labels=['with', 'without'])
         conf_matrix = conf_matrix.astype('float') / conf_matrix.sum(axis=1)[:, np.newaxis]
-        #cmap = plt.conf_matrix.Blues
         plt.figure()
         plt.imshow(conf_matrix, interpolation='nearest', cmap=plt.cm.Blues)
         plt.title(title)
@@ -234,11 +234,14 @@ def predict_images(images, model, options):
         plt.ylabel('True label')
         plt.xlabel('Predicted label')
         plt.tight_layout()
-        plt.savefig('confusion_matrix.jpg')
-
-        filename = "/Users/deathcat05/Desktop/ssu-geosciences-web/server/confusion_matrix.jpg"
-        return send_file(filename, mimetype='image/jpg')
+        matrixFilename = 'confusion-matrix.jpg'
+        plt.savefig(matrixFilename)
         
+        #Convert image to base64string so that it can be used in img src in React front-end
+        image = open(matrixFilename, 'rb') #open binary file in read mode 
+        base64Image = base64.b64encode(image.read())
+        return base64Image
+
 if __name__ == '__main__':
     app.run()
  
