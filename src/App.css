@@ -29,11 +29,14 @@
 
 #purpose {
   padding-top: 2em;
-  color: beige
+  color: lightgoldenrodyellow;
+  font-size: 20pt;
 }
 .jumbotron {
   background-image: url("https://d1w9csuen3k837.cloudfront.net/Pictures/2000x1125/7/2/3/131723_neural_net_shutterstock_544558780.jpg");
   background-size: 100%;
+  margin-top: 0px;
+  margin-bottom: -500px;
 }
 @keyframes App-logo-spin {
   from {

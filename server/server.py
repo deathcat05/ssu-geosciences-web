@@ -128,7 +128,6 @@ def predict_one_image(imageToPredict, model, options):
     
     if(model == 'resnet'):
         print('Model chosen is resnet')
-        #modelToUse = models + '/resnetWeights.h5'
         modelToUse = models + '/test.h5'
         print(modelToUse)
 
@@ -188,7 +187,8 @@ def predict_one_image(imageToPredict, model, options):
 
 def predict_images(images, model, options):
     print('inside predict_images function')
-    predictions = []
+    predictions = [] #The predicted values of each image
+
     #This 'actual' array is the hardcoded values of the images stored in the directory. Used for classifying.
     actual = ['without', 'with', 'with', 'with', 'with', 'with', 'with', 'with', 'without', 'without', 
              'with', 'with', 'without', 'without', 'without', 'without', 'with', 'with', 'with', 'without', 'without', 'with']
@@ -202,7 +202,7 @@ def predict_images(images, model, options):
         model_with_transfer.load_weights(modelToUse)
         print('load_weights successful')
         total_images = len(images)
-        print(total_images)
+
         for image in images:
                 resized_image = np.expand_dims(image, axis=0)
                 prediction = model_with_transfer.predict(resized_image)

@@ -44,6 +44,15 @@ ol li {
 #prediction-confidence {
     text-align: center
 }
+#image-preview {
+  height: 25%;
+  vertical-align: top;
+  margin-bottom: 0;
+}
+
+.prediction-image {
+    left: 10;
+}
 #upload {
     opacity: 0;
 }
@@ -52,3 +61,4 @@ ol li {
     height: 350px;
     width: 640px;
 }
+
